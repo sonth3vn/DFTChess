@@ -1,0 +1,146 @@
+fileFormatVersion: 2
+guid: 5863ad2cbb126b649a4d647662f9a646
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: danger
+    21300002: redadvisor
+    21300004: redcannon
+    21300006: redelephant
+    21300008: redhidden
+    21300010: redhorse
+    21300012: redmarshal
+    21300014: redrook
+    21300016: redsoldier
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: .25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 4096
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: .5, y: .5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: danger
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 149
+        width: 105
+        height: 105
+      alignment: 9
+      pivot: {x: .504761934, y: .485714287}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: redadvisor
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 81
+        width: 62
+        height: 66
+      alignment: 9
+      pivot: {x: .5, y: .515151501}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: redcannon
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 13
+        width: 62
+        height: 66
+      alignment: 9
+      pivot: {x: .5, y: .515151501}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: redelephant
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 81
+        width: 62
+        height: 66
+      alignment: 9
+      pivot: {x: .5, y: .515151501}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: redhidden
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 13
+        width: 62
+        height: 66
+      alignment: 9
+      pivot: {x: .5, y: .515151501}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: redhorse
+      rect:
+        serializedVersion: 2
+        x: 109
+        y: 188
+        width: 62
+        height: 66
+      alignment: 9
+      pivot: {x: .5, y: .515151501}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: redmarshal
+      rect:
+        serializedVersion: 2
+        x: 173
+        y: 188
+        width: 62
+        height: 66
+      alignment: 9
+      pivot: {x: .5, y: .515151501}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: redrook
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 120
+        width: 62
+        height: 66
+      alignment: 9
+      pivot: {x: .5, y: .515151501}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: redsoldier
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 52
+        width: 62
+        height: 66
+      alignment: 9
+      pivot: {x: .5, y: .515151501}
+      border: {x: 0, y: 0, z: 0, w: 0}
+  spritePackingTag: 
+  userData: 

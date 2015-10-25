@@ -1,0 +1,157 @@
+fileFormatVersion: 2
+guid: c8c8da44c4339814cbfa30bf2cc84ee0
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: blueadvisor
+    21300002: bluecannon
+    21300004: blueelephant
+    21300006: bluehidden
+    21300008: bluehorse
+    21300010: bluemarshal
+    21300012: bluerook
+    21300014: bluesoldier
+    21300016: dot
+    21300018: old_step_2
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: .25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 4096
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: .5, y: .5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: blueadvisor
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 188
+        width: 62
+        height: 66
+      alignment: 9
+      pivot: {x: .5, y: .515151501}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: bluecannon
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 120
+        width: 62
+        height: 66
+      alignment: 9
+      pivot: {x: .5, y: .515151501}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: blueelephant
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 52
+        width: 62
+        height: 66
+      alignment: 9
+      pivot: {x: .5, y: .515151501}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: bluehidden
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 188
+        width: 62
+        height: 66
+      alignment: 9
+      pivot: {x: .5, y: .515151501}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: bluehorse
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 188
+        width: 62
+        height: 66
+      alignment: 9
+      pivot: {x: .5, y: .515151501}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: bluemarshal
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 120
+        width: 62
+        height: 66
+      alignment: 9
+      pivot: {x: .5, y: .515151501}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: bluerook
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 52
+        width: 62
+        height: 66
+      alignment: 9
+      pivot: {x: .5, y: .515151501}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: bluesoldier
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 120
+        width: 62
+        height: 66
+      alignment: 9
+      pivot: {x: .5, y: .515151501}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: dot
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 22
+        width: 28
+        height: 28
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: old_step_2
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 194
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+  spritePackingTag: 
+  userData: 

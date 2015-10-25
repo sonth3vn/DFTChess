@@ -1,0 +1,19 @@
+#
+# Sprite sheet data for Unity.
+#
+# To import these sprites into your Unity project, download "TexturePackerImporter":
+# http://www.codeandweb.com/texturepacker/unity
+#
+# Sprite sheet: redchess.png (256 x 256)
+# $TexturePacker:SmartUpdate:962075e2f4ad65822f75c1ea692f1cd2:d46221609abac4f60b03f8eb05a56f4f:7a49646bbf0281e477487bf23220652e$
+#
+
+danger;2;149;105;105;0.5047619047619047;0.48571428571428577
+redadvisor;2;81;62;66;0.5;0.5151515151515151
+redcannon;2;13;62;66;0.5;0.5151515151515151
+redelephant;66;81;62;66;0.5;0.5151515151515151
+redhidden;66;13;62;66;0.5;0.5151515151515151
+redhorse;109;188;62;66;0.5;0.5151515151515151
+redmarshal;173;188;62;66;0.5;0.5151515151515151
+redrook;130;120;62;66;0.5;0.5151515151515151
+redsoldier;130;52;62;66;0.5;0.5151515151515151
