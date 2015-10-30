@@ -42,7 +42,9 @@ public class GameController : SA_Singleton<GameController> {
 	bool _isNotDangerous = false; //pomelo.on("onNotDangerous")
 	bool _hasMove = false; //Callback after move
 	bool _isEndgame = false;
+	bool _isGuestJoin = false;
 	bool _isOtherExit = false;
+	bool _isChat = false;
 	Point pCoord = new Point(); //Position goc
 	Point pPiece = new Point(); //Position dich
 	Point pCaptured = new Point(); //Position chess bi an 
@@ -51,6 +53,8 @@ public class GameController : SA_Singleton<GameController> {
 	string nameChessHidden;
 	string nameChessDestroy;
 	string nameChessCaptured;
+	JsonObject dataGuest;
+	ChatRecord chatRecord;
 	EndgameType typeEndgame;
 	IList _lsRule;
 	string _boardData;
@@ -86,6 +90,9 @@ public class GameController : SA_Singleton<GameController> {
 	public Text lblPTimeS;
 	public Image imgPAvartar;
 
+	public GameObject panelChat;
+	public ChatController chatController;
+
 	void Start(){
 		gameManager = GameManager.instance;
 		gameManager._gc = this;
@@ -95,10 +102,10 @@ public class GameController : SA_Singleton<GameController> {
 		_chessSelected = null;
 		_color = PlayerColor.kPlayerColorHost;
 		_table = GameManager.instance._table;
-		if (_table.guest != null) {
+		if (_table.guest.name != null) {
 			_color = PlayerColor.kPlayerColorGuest;
 		}
-
+		chatController = panelChat.GetComponent<ChatController> ();
 		Util.loadPictureCB = LoadPictureCallback;
 		SetupLabel ();
 		PomeloListen ();
@@ -124,7 +131,7 @@ public class GameController : SA_Singleton<GameController> {
 		string wwwPath = Constants.DOMAIN + player.avatar;
 		Util.instance.LoadPictureFromURL (wwwPath, "player");
 
-		if (otherPlayer != null) {
+		if (otherPlayer.name != null) {
 			lblOtherPName.text = otherPlayer.name;
 			lblOtherPLevel.text = @"" + otherPlayer.star;
 			lblOtherPCoin.text = @"" + otherPlayer.ruby;
@@ -153,6 +160,21 @@ public class GameController : SA_Singleton<GameController> {
 			isCreate = false;
 			creator.playerColor = _color;
 			creator.CreateMap (_boardData);
+		}
+
+		if (_isGuestJoin) {
+			_isGuestJoin = false;
+			if (_table.guest.name == null){
+				_table.guest.name = System.Convert.ToString(dataGuest["name"]);
+				_table.guest.uid = System.Convert.ToString(dataGuest["uid"]);
+				_table.guest.sid = System.Convert.ToString(dataGuest["sid"]);
+				_table.guest.roomName = System.Convert.ToString(dataGuest["rname"]);
+				_table.guest.avatar = System.Convert.ToString(dataGuest["avatar"]);
+				_table.guest.star = System.Convert.ToInt32(dataGuest["star"]);
+				_table.guest.ruby = System.Convert.ToInt32(dataGuest["ruby"]);
+				_table.guest.roomID = System.Convert.ToString(dataGuest["room"]);
+				SetupLabel();
+			}
 		}
 
 		if (isMove) {
@@ -239,7 +261,9 @@ public class GameController : SA_Singleton<GameController> {
 					break;
 				case "guestJoin":
 					Debug.Log ("guestJoin");
-					Debug.Log (data);
+//					Debug.Log (data);
+					_isGuestJoin = true;
+					dataGuest = (JsonObject)data["guest"];
 					break;
 				case "playerExit":
 					if (gameState != GameplayState.kGameplayPlaying){
@@ -316,8 +340,29 @@ public class GameController : SA_Singleton<GameController> {
 					isShowHidden = true;
 					break;
 				}
+				case "chat":{
+					string msg = System.Convert.ToString(data["msg"]);
+					JsonObject playerObj = (JsonObject)data["sender"];
+					string username = System.Convert.ToString(playerObj["name"]);
+					string avatar = System.Convert.ToString(playerObj["avatar"]);
+					ChatRecord record = new ChatRecord(avatar, username, msg);
+					OnChat(record);
+					break;
+				}
+				case "onTimeout":{
+					if (gameState != GameplayState.kGameplayPlaying){
+						break;
+					}
+					_isEndgame = true;
+					typeEndgame = EndgameType.kEndgameTypeLose;
+					break;
+				}
 			}
 		});
+	}
+
+	public void OnChat(ChatRecord record){
+		chatController.HandlerChat (record);
 	}
 
 	public void CreateMap(string boardData){
@@ -327,7 +372,7 @@ public class GameController : SA_Singleton<GameController> {
 
 	/* --- Helper method --- */
 	public void PressedBtnStart(GameObject sender){
-		if (gameState != GameplayState.kGameplayWaiting)
+		if (_table.guest.name == null || gameState != GameplayState.kGameplayWaiting)
 			return;
 		sender.SetActive (false);
 		GameManager.instance.PressedStartGame ();
@@ -450,8 +495,12 @@ public class GameController : SA_Singleton<GameController> {
 		float range = creator.range;
 		Point pMove = new Point{x = pos.x, y = pos.y};
 		if (_color == PlayerColor.kPlayerColorGuest) {
-			pMove.x = 8 - pos.x;
+			pMove.x = 8 - pMove.x;
 		}
+		else{
+			pMove.y = 9 - pMove.y;
+		}
+
 		chess.transform.localPosition = new Vector3(startObject.localPosition.x + range * pMove.x, 
 		                                            startObject.localPosition.y + range * pMove.y,
 		                                              1);
@@ -488,6 +537,9 @@ public class GameController : SA_Singleton<GameController> {
 		float range = creator.range;
 		if (_color == PlayerColor.kPlayerColorGuest) {
 			dangerPos.x = 8 - dangerPos.x;
+		}
+		else{
+			dangerPos.y = 9 - dangerPos.y;
 		}
 
 		_dangerous.transform.localPosition = new Vector3(startObject.localPosition.x + range * dangerPos.x, 
@@ -565,6 +617,10 @@ public class GameController : SA_Singleton<GameController> {
 
 	public void ExitTable(){
 		gameManager.PressedBack ();
+	}
+
+	public void PressedShowChat(){
+		panelChat.SetActive (true);
 	}
 	
 }

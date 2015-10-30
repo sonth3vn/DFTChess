@@ -80,22 +80,22 @@ public class MapCreator : MonoBehaviour {
 
 	public void CreateChess(string chessName, Point pos, int color){
 		// Create va set vi tri object
+		Point pCreate = new Point{x = pos.x, y = pos.y};
+		if (playerColor == PlayerColor.kPlayerColorGuest) {
+			pCreate.x = 8 - pCreate.x;
+		}
+		else{
+			pCreate.y = 9 - pCreate.y;
+		}
+
 		GameObject instObj = (GameObject)Instantiate (prefChess, 
 		                                              Vector3.zero,
 		                                              Quaternion.identity);
 		instObj.transform.SetParent(chessPanel);
 		instObj.transform.localScale = new Vector3(0.8f, 0.8f, 1);
-		instObj.transform.localPosition = new Vector3(startObject.localPosition.x + range * pos.x, 
-		                                              startObject.localPosition.y + range * pos.y,
+		instObj.transform.localPosition = new Vector3(startObject.localPosition.x + range * pCreate.x, 
+		                                              startObject.localPosition.y + range * pCreate.y,
 		                                              1);
-
-		if (playerColor == PlayerColor.kPlayerColorGuest) {
-//			instObj.transform.localPosition = new Vector3(startObject.localPosition.x + range * (8 - pos.x), 
-//			                                              startObject.localPosition.y + range * (9 - pos.y),
-//			                                              1);
-			pos.x = 8 - pos.x;
-//			pos.y = 9 - pos.y;
-		}
 
 		if ((int)GameController.instance._color % 10 != -color % 10) {
 			Destroy(instObj.GetComponent<Button>());
@@ -120,20 +120,31 @@ public class MapCreator : MonoBehaviour {
 
 	public void CreateCheckMate(Point pos){
 		// Create va set vi tri object
+		Point pCreate = new Point{x = pos.x, y = pos.y};
+		if (playerColor == PlayerColor.kPlayerColorGuest) {
+			pCreate.x = 8 - pCreate.x;
+			pCreate.y = 9 - pCreate.y;
+			pos.y = 9 - pos.y;
+		}
+		else{
+			pCreate.y = 9 - pCreate.y;
+		}
 		GameObject instObj = (GameObject)Instantiate (prefCheckmate, 
 		                                              Vector3.zero,
 		                                              Quaternion.identity);
 		instObj.transform.SetParent(chessPanel);
 		instObj.transform.localScale = new Vector3 (0.75f, 0.75f, 1);
-		instObj.transform.localPosition = new Vector3(startObject.localPosition.x + range * pos.x, 
-		                                              startObject.localPosition.y + range * pos.y,
+		instObj.transform.localPosition = new Vector3(startObject.localPosition.x + range * pCreate.x, 
+		                                              startObject.localPosition.y + range * pCreate.y,
 		                                              1);
-		if (playerColor == PlayerColor.kPlayerColorGuest) {
-			instObj.transform.localPosition = new Vector3(startObject.localPosition.x + range * (8 - pos.x), 
-			                                              startObject.localPosition.y + range * (9 - pos.y),
-			                                              1);
-			pos.y = 9 - pos.y;
-		}
+//		pos.y = 9 - pos.y;
+//		if (playerColor == PlayerColor.kPlayerColorGuest) {
+//			instObj.transform.localPosition = new Vector3(startObject.localPosition.x + range * (8 - pos.x), 
+//			                                              startObject.localPosition.y + range * (9 - pos.y),
+//			                                              1);
+////			pos.y = 9 - pos.y;
+//		}
+
 		lsCheckmate.Add (instObj);
 
 		Checkmate checkmate = instObj.GetComponent<Checkmate> ();

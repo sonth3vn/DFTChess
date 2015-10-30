@@ -16,13 +16,19 @@ public class GameManager : SA_Singleton<GameManager> {
 	public RoomController _rc;
 
 	[Header("Share")]
-	public Users user;
+	public Users _user;
 	public IList _lsServer;
 	public GameState _gameState;
-	public JsonObject _loginUser;
+	public JsonObject _currentUser;
 	public string roomData;
 
+	public string dataCreateTable;
+
 	public Table _table = new Table();
+
+	// Luu lai trang thai ban choi de set khi tao ban choi moi
+	// Neu khong co thi dung trang thai mac dinh
+	public Table oldTable = new Table(); 
 
 	// Use this for initialization
 	void Awake () {
@@ -30,9 +36,15 @@ public class GameManager : SA_Singleton<GameManager> {
 	}
 
 	void Start(){
-		Users user = new Users ();
-		GameManager.instance.user = user;
+		_user = new Users ();
 		_gameState = GameState.kStateLoading;
+
+		// Set gia tri mac dinh
+		oldTable.name = "Độc cô cầu bại";
+		oldTable.ruby = 1000;
+		oldTable.type = 0;
+		oldTable.time = 300;
+		oldTable.password = "";
 	}
 	
 	// Update is called once per frame
@@ -52,6 +64,8 @@ public class GameManager : SA_Singleton<GameManager> {
 			_gameState = GameState.kStateLobby;
 			nextScene = "LobbyScene";
 			//Request to pomelo
+			//_pclient.disconnect();
+
 		}
 		else if (nameScene.Equals("GameScene")){
 			_gameState = GameState.kStateJoinRoom;
@@ -60,6 +74,7 @@ public class GameManager : SA_Singleton<GameManager> {
 			JsonObject param  = new JsonObject();
 			param["room"] = _table.roomID;
 			_pclient.request (Constants.EXITTABLE, param, OnQueryExitTable);
+			_table = new Table(); // Reset gia tri ban choi
 		}
 		Application.LoadLevel(nextScene);
 	}
@@ -82,20 +97,28 @@ public class GameManager : SA_Singleton<GameManager> {
 				                 {
 					Debug.Log ("Try to login ...");
 					JsonObject userLogin  = new JsonObject();
-					userLogin["uid"] = user.userID;
+					userLogin["uid"] = _user.userID;
 					userLogin["sid"] = sid;
 					userLogin["sname"] = sname;
-					_pclient.request (Constants.LOGINSERVER, userLogin, this.OnQueryLogin);
-					
-				});
-				
+					_pclient.request (Constants.LOGINSERVER, userLogin, this.OnQueryLogin);				
+				});			
 			});
-			//						_pclient.on("onStatus", (dataStatus) => {
-			//							Debug.Log ("onStatus: " + dataStatus);
-			//						});
-//			JsonObject dataRequest = new JsonObject();
-//			dataRequest["room"] = table._name.Replace("r-", "");
-//			_pclient.request ("chinesechess.chinesechessHandler.createorjoin", dataRequest, OnResponseJoin);
+		}
+		else {
+			Debug.LogError ("pClient null");
+		}
+	}
+
+	public void CreateTable(Table table){
+		if (_pclient != null) {
+			Debug.Log ("Try to create table ...");
+			JsonObject room  = new JsonObject();
+			room["name"] = table.name;
+			room["type"] = @"" + table.type;
+			room["ruby"] = @"" + table.ruby;
+			room["time"] = @"" + table.time;
+			room["password"] = @"" + table.password;
+			_pclient.request (Constants.CREATETABLE, room, this.OnQueryCreateTable);
 		}
 		else {
 			Debug.LogError ("pClient null");
@@ -107,48 +130,49 @@ public class GameManager : SA_Singleton<GameManager> {
 			Debug.Log ("Try to join table ...");
 			JsonObject room  = new JsonObject();
 			room["room"] = table.table.roomID;
-			Debug.Log (table.table.roomID);
+//			Debug.Log (table.table.roomID);
 			_pclient.request (Constants.JOINTABLE, room, this.OnQueryJoinTable);
 		}
 		else {
 			Debug.LogError ("pClient null");
 		}
 
-		//sonth
-		_pclient.on("onStatus", (data) => {
-			IList rooms = Util.DeserializeJsonArrayToList(System.Convert.ToString(data["rooms"]));
-			IDictionary room = rooms[0] as IDictionary;
-			_table.roomID = System.Convert.ToString(room["id"]);
-			_table.status = System.Convert.ToString(room["status"]);
-			_table.ruby = System.Convert.ToInt32(room["ruby"]);
-			_table.type = System.Convert.ToInt32(room["type"]);
-			_table.time = System.Convert.ToInt32(room["time"]);
-			
-			IDictionary jsonHost = room["host"] as IDictionary;
-			Player host = _table.host;
-			host.name = System.Convert.ToString(jsonHost["name"]);
-			host.uid = System.Convert.ToString(jsonHost["uid"]);
-			host.sid = System.Convert.ToString(jsonHost["sid"]);
-			host.roomName = System.Convert.ToString(jsonHost["rname"]);
-			host.avatar = System.Convert.ToString(jsonHost["avatar"]);
-			host.star = System.Convert.ToInt32(jsonHost["star"]);
-			host.ruby = System.Convert.ToInt32(jsonHost["ruby"]);
-			host.roomID = System.Convert.ToString(jsonHost["room"]);
-			
-			IDictionary jsonGuest = room["guest"] as IDictionary;
-			if (jsonGuest.Contains("uid")){
-				// guest not null
-				Player guest = _table.guest;
-				guest.name = System.Convert.ToString(jsonGuest["name"]);
-				guest.uid = System.Convert.ToString(jsonGuest["uid"]);
-				guest.sid = System.Convert.ToString(jsonGuest["sid"]);
-				guest.roomName = System.Convert.ToString(jsonGuest["rname"]);
-				guest.avatar = System.Convert.ToString(jsonGuest["avatar"]);
-				guest.star = System.Convert.ToInt32(jsonGuest["star"]);
-				guest.ruby = System.Convert.ToInt32(jsonGuest["ruby"]);
-				guest.roomID = System.Convert.ToString(jsonGuest["room"]);
-			}
-		});
+//		//sonth
+//		_pclient.on("onStatus", (data) => {
+//			//set gia tri cho _table
+//			IList rooms = Util.DeserializeJsonArrayToList(System.Convert.ToString(data["rooms"]));
+//			IDictionary room = rooms[0] as IDictionary;
+//			_table.roomID = System.Convert.ToString(room["id"]);
+//			_table.status = System.Convert.ToString(room["status"]);
+//			_table.ruby = System.Convert.ToInt32(room["ruby"]);
+//			_table.type = System.Convert.ToInt32(room["type"]);
+//			_table.time = System.Convert.ToInt32(room["time"]);
+//			
+//			IDictionary jsonHost = room["host"] as IDictionary;
+//			Player host = _table.host;
+//			host.name = System.Convert.ToString(jsonHost["name"]);
+//			host.uid = System.Convert.ToString(jsonHost["uid"]);
+//			host.sid = System.Convert.ToString(jsonHost["sid"]);
+//			host.roomName = System.Convert.ToString(jsonHost["rname"]);
+//			host.avatar = System.Convert.ToString(jsonHost["avatar"]);
+//			host.star = System.Convert.ToInt32(jsonHost["star"]);
+//			host.ruby = System.Convert.ToInt32(jsonHost["ruby"]);
+//			host.roomID = System.Convert.ToString(jsonHost["room"]);
+//			
+//			IDictionary jsonGuest = room["guest"] as IDictionary;
+//			if (jsonGuest.Contains("uid")){
+//				// guest not null
+//				Player guest = _table.guest;
+//				guest.name = System.Convert.ToString(jsonGuest["name"]);
+//				guest.uid = System.Convert.ToString(jsonGuest["uid"]);
+//				guest.sid = System.Convert.ToString(jsonGuest["sid"]);
+//				guest.roomName = System.Convert.ToString(jsonGuest["rname"]);
+//				guest.avatar = System.Convert.ToString(jsonGuest["avatar"]);
+//				guest.star = System.Convert.ToInt32(jsonGuest["star"]);
+//				guest.ruby = System.Convert.ToInt32(jsonGuest["ruby"]);
+//				guest.roomID = System.Convert.ToString(jsonGuest["room"]);
+//			}
+//		});
 	}
 
 	public void PressedStartGame(){
@@ -162,10 +186,28 @@ public class GameManager : SA_Singleton<GameManager> {
 		}
 	}
 
+	public void EnterChat(string msg){
+		if (_pclient != null) {
+			Debug.Log("Send request chat ...");
+			JsonObject param  = new JsonObject();
+			param["room"] = _table.roomID;
+			param["message"] = msg;
+			ChatRecord record = new ChatRecord(_user.avatar, _user.name, msg);
+			ChatController controller = GameObject.FindObjectOfType<ChatController>();
+			controller.HandlerChat(record);
+			_pclient.request (Constants.CHAT, param, this.OnQueryChat);
+		}
+		else {
+			Debug.LogError ("pClient null");
+		}
+	}
+
 	public void OnQueryLogin(JsonObject result){
 		int code = System.Convert.ToInt32 (result ["code"]);
 		if (code == 200) {
 			Debug.Log (result);
+			JsonObject jsonUser = (JsonObject)result["currentUser"];
+			_currentUser = jsonUser;
 			roomData = System.Convert.ToString(result["data"]);
 			_lobby.isJoin = true;
 		}
@@ -174,9 +216,43 @@ public class GameManager : SA_Singleton<GameManager> {
 		}
 	}
 
+	public void OnQueryCreateTable(JsonObject result){
+		int code = System.Convert.ToInt32 (result ["code"]);
+		if (code == 200) {
+			Debug.Log (result);
+//			IList rooms = Util.DeserializeJsonArrayToList(System.Convert.ToString(data["rooms"]));
+//			IDictionary room = rooms[0] as IDictionary;
+			_table.name = System.Convert.ToString(result["name"]);
+			_table.ruby = System.Convert.ToInt32(result["ruby"]);
+			_table.type = System.Convert.ToInt32(result["type"]);
+			_table.time = System.Convert.ToInt32(result["time"]);
+
+//			_table.roomID = System.Convert.ToString(room["id"]);
+//			_table.status = System.Convert.ToString(room["status"]);
+			JsonObject jsonHost = (JsonObject)result["host"];
+			Player host = _table.host;
+			host.name = System.Convert.ToString(jsonHost["name"]);
+			host.uid = System.Convert.ToString(jsonHost["uid"]);
+			host.sid = System.Convert.ToString(jsonHost["sid"]);
+			host.roomName = System.Convert.ToString(jsonHost["rname"]);
+			host.avatar = System.Convert.ToString(jsonHost["avatar"]);
+			host.star = System.Convert.ToInt32(jsonHost["star"]);
+			host.ruby = System.Convert.ToInt32(jsonHost["ruby"]);
+			host.roomID = System.Convert.ToString(jsonHost["room"]);
+			_table.roomID = host.roomID;
+
+			_rc.isPlay = true;
+		}
+		else{
+			Debug.Log ("OnQueryCreateTable, code: " + code);
+		}
+	}
+
 	public void OnQueryJoinTable(JsonObject result){
 		int code = System.Convert.ToInt32 (result ["code"]);
 		if (code == 200) {
+			Debug.Log (result);
+			_rc._dataBoard = result;
 			_rc.isPlay = true;
 		}
 		else{
@@ -203,6 +279,17 @@ public class GameManager : SA_Singleton<GameManager> {
 		}
 		else{
 			Debug.Log ("OnQueryStartGame, code: " + code);
+		}
+	}
+
+	public void OnQueryChat(JsonObject result){
+		int code = System.Convert.ToInt32 (result ["code"]);
+		if (code == 200) {
+			//Create board
+			Debug.Log (result);
+		}
+		else{
+			Debug.Log ("OnQueryChat, code: " + code);
 		}
 	}
 	

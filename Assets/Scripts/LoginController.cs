@@ -22,7 +22,6 @@ public class LoginController : MonoBehaviour {
 
 	bool isLogin = false;
 
-
 	// Use this for initialization
 	void Start () {
 		manager = GameManager.instance;
@@ -86,7 +85,7 @@ public class LoginController : MonoBehaviour {
 		if (www.error == null)
 		{
 			Debug.Log("WWW Ok!: " + www.text);
-			GameManager.instance.user.userID = www.text.Replace("\"", "");
+			GameManager.instance._user.userID = www.text.Replace("\"", "");
 			pclient = GameManager._pclient;
 			if (pclient != null){
 				pclient.connect(null, data =>
@@ -108,6 +107,8 @@ public class LoginController : MonoBehaviour {
 	public void OnResponseFromGate(JsonObject result){
 		if(System.Convert.ToInt32(result["code"]) == 200){
 			Debug.Log ("Connect gate ok...");
+			Debug.Log (result);
+
 			string jsonServer = System.Convert.ToString(result["server"]);
 			lsServer = Util.DeserializeJsonArrayToList(jsonServer);
 			isLogin = true;

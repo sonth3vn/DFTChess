@@ -7,16 +7,29 @@ using SimpleJson;
 
 public class RoomController : MonoBehaviour {
 	PomeloClient pclient;
-
+	
+	public GameObject createPanel;
+	private CreatePanelController createPanelTable;
 	public Transform roomPanel;
 	public Dictionary<string, TableController> lsTablePlay;
 	public Dictionary<string, TableController> lsTableWait;
 	public int _numTablePlay; //listen variable
-//	public int _counting;
 	public IDictionary _newData;
-	public List<string> lsDeletePlayID = new List<string>();
+
+	//sonth
+	public List<IDictionary> lsDataPlay = new List<IDictionary>();
+	public Dictionary<string, int> lsIdxTablePlay = new Dictionary<string, int> ();
+
+	//public List<string> lsDeletePlayID = new List<string>();
 
 	public bool isPlay = false;
+
+	public InputField txtTableName;
+	public InputField txtPassword;
+	
+	[HideInInspector] public int typeBoard;
+	[HideInInspector] public int rubyBoard;
+	[HideInInspector] public int timeBoard;
 
 	[Header("Table")]
 	public GameObject prefabTable;
@@ -37,40 +50,60 @@ public class RoomController : MonoBehaviour {
 //	public Sprite[] lsAvatar;
 	public Sprite[] lsType;
 
-	JsonObject _dataOnStatus;
+	public JsonObject _dataBoard;
 
+	public bool f5PanelPlay = false;
+	public bool f5PanelWait = false;
+	
 	// Use this for initialization
 	void Start () {
 		lsTablePlay = new Dictionary<string, TableController> ();
 		lsTableWait = new Dictionary<string, TableController> ();
 		pclient = GameManager._pclient;
 		Util.loadPictureCB = LoadPictureCallback;
+		createPanelTable = createPanel.GetComponent<CreatePanelController> ();
+
+		LoadConfigCreateTable (); //load config create chess board
+
+		Table oldTable = GameManager.instance.oldTable;
+		txtTableName.text = oldTable.name;
 
 		//Create table
 		if (GameManager.instance.roomData.Length > 0) {
 			IList iLsTable = Util.DeserializeJsonArrayToList(GameManager.instance.roomData);
 			foreach (var obj in iLsTable){
 				IDictionary dict = obj as IDictionary;
-				//string id = System.Convert.ToString(dict["id"]);
-//				_newData = dict["id"];
-//				_numTablePlay += 1;
-				CreateNewTable(dict, true);
+				lsDataPlay.Add(dict);
+				f5PanelPlay = true;
+				string id = System.Convert.ToString(dict["id"]);
+				lsIdxTablePlay.Add(id, (lsDataPlay.Count - 1));
+//				CreateNewTable(dict, true);
 			}
-			_numTablePlay += iLsTable.Count;
+			//_numTablePlay += iLsTable.Count;
 		}
 
 		//Handle events
 		pclient.on("onNewRoom", (data) => {
+			Debug.Log("onNewRoom");
 			Debug.Log (data["room"]);
-			_newData = Util.DeserializeJsonToDict(System.Convert.ToString(data["room"]));
-			_numTablePlay += 1; // Thay doi numTable de loop trong update chay
+			//_newData = Util.DeserializeJsonToDict(System.Convert.ToString(data["room"]));
+			//_numTablePlay += 1; // Thay doi numTable de loop trong update chay
+			IDictionary roomDict = Util.DeserializeJsonToDict(System.Convert.ToString(data["room"]));
+			lsDataPlay.Add(Util.DeserializeJsonToDict(System.Convert.ToString(data["room"])));
+			string id = System.Convert.ToString(roomDict["id"]);
+			lsIdxTablePlay.Add (id, (lsDataPlay.Count - 1));
+			f5PanelPlay = true;
 		});
 
 		pclient.on("onDeleteRoom", (data) => {
 			Debug.Log (data);
 			string tableID = System.Convert.ToString(data["room"]);
-			_numTablePlay -= 1;
-			lsDeletePlayID.Add(tableID);
+			int idx = lsIdxTablePlay[tableID];
+			lsDataPlay.RemoveAt(idx);
+			lsIdxTablePlay.Remove(tableID);
+			f5PanelPlay = true;
+//			_numTablePlay -= 1;
+//			lsDeletePlayID.Add(tableID);
 		});
 
 		GameManager.instance._rc = this;
@@ -82,21 +115,76 @@ public class RoomController : MonoBehaviour {
 		{
 			yield return 0; // wait for next frame
 		}
-		
+
+		//parse data
+		//set gia tri cho _table
+		Table table = GameManager.instance._table;
+		if (table == null) {
+			// Khi player tao ban, table da duoc set 
+			// Set cac gia tri cua table khi join ban
+			table.ruby = System.Convert.ToInt32(_dataBoard["ruby"]);
+			table.type = System.Convert.ToInt32(_dataBoard["type"]);
+			table.time = System.Convert.ToInt32(_dataBoard["time"]);
+			
+			JsonObject jsonHost = (JsonObject)_dataBoard ["host"];
+			Player host = table.host;
+			host.name = System.Convert.ToString(jsonHost["name"]);
+			host.uid = System.Convert.ToString(jsonHost["uid"]);
+			host.sid = System.Convert.ToString(jsonHost["sid"]);
+			host.roomName = System.Convert.ToString(jsonHost["rname"]);
+			host.avatar = System.Convert.ToString(jsonHost["avatar"]);
+			host.star = System.Convert.ToInt32(jsonHost["star"]);
+			host.ruby = System.Convert.ToInt32(jsonHost["ruby"]);
+			host.roomID = System.Convert.ToString(jsonHost["room"]);
+			
+			table.roomID = host.roomID;
+			
+			JsonObject jsonGuest = (JsonObject)_dataBoard ["guest"];
+			if (jsonGuest.ContainsKey("uid")){
+				// guest not null
+				Player guest = table.guest;
+				guest.name = System.Convert.ToString(jsonGuest["name"]);
+				guest.uid = System.Convert.ToString(jsonGuest["uid"]);
+				guest.sid = System.Convert.ToString(jsonGuest["sid"]);
+				guest.roomName = System.Convert.ToString(jsonGuest["rname"]);
+				guest.avatar = System.Convert.ToString(jsonGuest["avatar"]);
+				guest.star = System.Convert.ToInt32(jsonGuest["star"]);
+				guest.ruby = System.Convert.ToInt32(jsonGuest["ruby"]);
+				guest.roomID = System.Convert.ToString(jsonGuest["room"]);
+			}
+		}
+	
 		GameManager.instance.ChangeState (GameState.kStateJoinTable);
 		Application.LoadLevel("GameScene");
 	}
 
 	void Update(){
-		if (_numTablePlay > lsTablePlay.Keys.Count) {
-			CreateNewTable(_newData, true);
+//		if (_numTablePlay > lsTablePlay.Keys.Count) {
+//			CreateNewTable(_newData, true);
+//		}
+
+		if (f5PanelPlay) {
+			f5PanelPlay = false;
+			RefreshPanelPlay();
 		}
 
-		if (lsDeletePlayID.Count > 0) {
-			for (int i = 0; i < lsDeletePlayID.Count; i++){
-				DeleteTable(lsDeletePlayID[i], true);
-				lsDeletePlayID.RemoveAt(i);
-			}
+//		if (lsDeletePlayID.Count > 0) {
+//			for (int i = 0; i < lsDeletePlayID.Count; i++){
+//				DeleteTable(lsDeletePlayID[i], true);
+//				lsDeletePlayID.RemoveAt(i);
+//			}
+//		}
+	}
+
+	void RefreshPanelPlay(){
+		foreach (var obj in lsTablePlay.Keys) {
+			TableController table = lsTablePlay[obj];
+			Destroy(table.gameObject);
+		}
+		lsTablePlay.Clear ();
+
+		foreach (var data in lsDataPlay) {
+			CreateNewTable(data, true);
 		}
 	}
 
@@ -171,7 +259,7 @@ public class RoomController : MonoBehaviour {
 			lsTable = lsTableWait;
 		}
 		TableController table = lsTable [tableID];
-		if (table != null) {
+		if (table != null && lsTable.ContainsKey(tableID)) {
 			lsTable.Remove (tableID);
 			Destroy (table.gameObject);
 		}
@@ -201,6 +289,93 @@ public class RoomController : MonoBehaviour {
 		TableController table = lsTablePlay [tableID];
 		table.spAvatar.sprite = Sprite.Create (result, table.spAvatar.sprite.rect, new Vector2(0.5f, 0.5f));
 		//source.name = "123";
+	}
+
+	public void PressedCreateTable(){
+		createPanel.SetActive (true);
+	}
+
+	public void CreateNewTable(){
+		// Type, ruby, time nhan duoc tu bang selection 
+		// Doc method ChooseItem trong CreatePanelController
+		// Fake table name
+		string tableName = txtTableName.text;
+		string password = txtPassword.text;
+		int type = typeBoard;
+		int ruby = rubyBoard;
+		int time = timeBoard;
+		Table table = new Table ();
+		table.name = tableName;
+		table.type = type;
+		table.ruby = ruby;
+		table.time = time;
+		table.password = password;
+		GameManager.instance.oldTable = table; //Luu lai de dung cho lan tao ban tiep theo
+		GameManager.instance.CreateTable (table);
+	}
+
+	public void CancelCreateTable(){
+		createPanel.SetActive (false);
+	}
+
+	public void LoadConfigCreateTable(){
+		string dataBoard = GameManager.instance.dataCreateTable;
+		//Fake
+		for (int i = 0; i < 4; i++) {
+			string strCap = "Cờ tướng thường";
+			if (i == 1){
+				strCap = "Cờ tướng úp";
+			}
+			else if (i == 2){
+				strCap = "Cờ úp sĩ chúa";
+			}
+			else if (i == 3){
+				strCap = "Cờ chấp nước";
+			}
+			CellCreateTableSelection cell = new CellCreateTableSelection{
+				caption = strCap,
+				value = i
+			};
+			createPanelTable.AddItemTypeChess(cell);
+		}
+
+		for (int i = 0; i < 4; i++) {
+			string strCap = "1000";
+			if (i == 1){
+				strCap = "5000";
+			}
+			else if (i == 2){
+				strCap = "10000";
+			}
+			else if (i == 3){
+				strCap = "20000";
+			}
+			CellCreateTableSelection cell = new CellCreateTableSelection{
+				caption = strCap,
+				value = int.Parse(strCap)
+			};
+			createPanelTable.AddItemCoinBet(cell);
+		}
+
+		for (int i = 0; i < 4; i++) {
+			string strCap = "300";
+			if (i == 1){
+				strCap = "600";
+			}
+			else if (i == 2){
+				strCap = "1200";
+			}
+			else if (i == 3){
+				strCap = "3600";
+			}
+			CellCreateTableSelection cell = new CellCreateTableSelection{
+				caption = "" + (int.Parse(strCap) / 60) + " phút",
+				value = int.Parse(strCap)
+			};
+			createPanelTable.AddItemTimePlay(cell);
+		}
+
+		createPanelTable.RefreshAllDropDownList ();
 	}
 	
 	

@@ -16,10 +16,12 @@ public class Player{
 
 public class Table{
 	public string roomID { get; set; }
+	public string name { get; set; }
 	public Player host = new Player ();
 	public Player guest = new Player ();
 	public string status { get; set; }
 	public int ruby { get; set; }
 	public int type { get; set; }
 	public int time { get; set; }
+	public string password { get; set; }
 }

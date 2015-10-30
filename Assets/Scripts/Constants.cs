@@ -6,12 +6,14 @@
 //	public const string URLREG = "http://dft.vn:3000/register";
 	public const string GATESERVER = "gate.handle.connect";
 	public const string LOGINSERVER = "connector.ConnectorHandler.login";
+	public const string CREATETABLE = "chinesechess.Handler.createRoom";
 	public const string JOINTABLE = "chinesechess.Handler.createorjoin";
 	public const string STARTGAME = "chinesechess.Handler.begin";
 	public const string SELECTCHESS = "chinesechess.Handler.selected";
 	public const string MOVECHESS = "chinesechess.Handler.chess";
 	public const string SHOWHIDDENCHESS = "chinesechess.Handler.showhiddenchess";
 	public const string EXITTABLE = "chinesechess.Handler.exit";
+	public const string CHAT = "chinesechess.Handler.chatRoom";
 
 	public const string ERROR = "Có lỗi xảy ra";
 	public const string OK = "Đồng ý";
@@ -46,4 +48,11 @@ public enum ChessColor{
 	BLUE = -1,
 	REDHIDDEN = 11,
 	BLUEHIDDEN = -11
+}
+
+public enum ChessType{
+	kChessTypeNormal = 0,
+	kChessTypeHidden = 1,
+	kChessTypeBossAdvisor = 2,
+	kChessTypeMoveBonus = 3
 }
